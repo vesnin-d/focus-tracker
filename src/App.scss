@@ -1,0 +1,38 @@
+@import 'colors';
+
+.app { 
+  height: 100vh;
+  text-align: center;
+  background-color: $coral;
+
+  input {
+    background-color: $light-grey;
+  
+    &:hover {
+      border-color: $light-blue;
+    }
+  
+    &:focus {
+      border-color: $blue;
+    }
+  }
+}
+
+.main {
+  width: 640px;
+  margin: auto;
+}
+
+.task {
+  display: inline-block;
+  padding: 5px 10px;
+  color: $light-grey;
+  border-bottom: 1px solid $light-blue;
+
+  .icon {
+    vertical-align: bottom;
+    cursor: pointer;
+  }
+}
+
+
