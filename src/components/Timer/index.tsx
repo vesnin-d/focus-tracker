@@ -1,25 +1,43 @@
 import React, { FC, useState, useEffect, useCallback } from 'react';
 import './index.scss';
+import { getTimestampInSeconds } from '../../utils';
 
 export interface TimerDescriptor {
     isRunning: boolean;
     startedAt: number;
+    remains: number;
 }
 
 export interface Props {
-    currentTimer: TimerDescriptor;
+    currentTimer?: TimerDescriptor;
     onStart: () => void;
     onPause: () => void;
-    onCancel: () => void;
+    onCancel?: () => void;
     onEnd: () => void;
-    onTick: () => void;
+    onTick?: () => void;
 }
 
 const TIMER_START_VALUE = 25 * 60 * 1000;
 
-const Timer: FC<Props> = ({ currentTimer, onEnd }) => {
-    const [ time, setTime ] = useState(TIMER_START_VALUE);
-    const [ isRunning, setIsRunning ] = useState(false);
+const Timer: FC<Props> = ({ currentTimer, onEnd, onStart, onPause }) => {
+    const [ time, setTime ] = useState(
+        currentTimer ? currentTimer.remains * 1000 : TIMER_START_VALUE
+    );
+    const [ isRunning, setIsRunning ] = useState(
+        currentTimer ? currentTimer.isRunning : false
+    );
+
+    useEffect(() => {
+        if(currentTimer) {
+            console.log(currentTimer.startedAt + currentTimer.remains, getTimestampInSeconds());
+            setTime(
+                ((
+                    currentTimer.startedAt + currentTimer.remains
+                ) - getTimestampInSeconds()) * 1000
+            );
+            setIsRunning(currentTimer.isRunning);
+        }
+    }, [currentTimer]);
     
     useEffect(() => {
         if (isRunning) {
@@ -48,6 +66,16 @@ const Timer: FC<Props> = ({ currentTimer, onEnd }) => {
         }
     }, [time, onEnd]);
 
+    const start = useCallback(() => {
+        setIsRunning(true);
+        onStart();
+    }, [setIsRunning, onStart]);
+
+    const pause = useCallback(() => {
+        setIsRunning(false);
+        onPause();
+    }, [setIsRunning, onPause]);
+
     const reset = useCallback(() => {
         setTime(TIMER_START_VALUE);
         setIsRunning(false);
@@ -69,14 +97,14 @@ const Timer: FC<Props> = ({ currentTimer, onEnd }) => {
         <div className='timer-buttons'>
             {
                 isRunning ? <button 
-                    title='Start'
-                    onClick={() => setIsRunning(false)}
+                    title='Pause'
+                    onClick={pause}
                     className='timer-button'
                 >
                     <i className='material-icons'>pause</i>
                 </button> : <button 
-                    title='Pause'
-                    onClick={() => setIsRunning(true)}
+                    title='Start'
+                    onClick={start}
                     className='timer-button'
                 >
                     <i className='material-icons'>play_arrow</i>
