@@ -1,0 +1,30 @@
+@import "../../colors";
+
+.timer {
+    color: $light-grey;
+    margin-bottom: 30px;
+}
+
+.timer-time {
+    font-size: 10rem;
+}
+
+.timer-button {
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    border: 2px solid $light-grey;
+    border-radius: 50%;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &:not(:last-child) {
+        margin-right: 10px;
+    }
+
+    &:hover {
+        color: $coral;
+        background-color: $light-grey;
+    }
+}
