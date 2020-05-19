@@ -3,7 +3,7 @@
 .app { 
   height: 100vh;
   text-align: center;
-  background-color: $coral;
+  background-color: $platinum;
 
   input {
     background-color: $light-grey;
@@ -33,6 +33,12 @@
     vertical-align: bottom;
     cursor: pointer;
   }
+}
+
+.link {
+  color: blue;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 

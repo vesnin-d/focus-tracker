@@ -12,12 +12,14 @@ const LoginForm: FC<Props> = ({ onLogin }) => {
     });
 
     const handleLogin = useCallback(() => {
-        return login(
-            loginData.email, 
-            loginData.password
-        ).then(({ data }) => 
-            onLogin(data.login.token, data.login.userId)
-        )
+        if(loginData.email && loginData.password) {
+            return login(
+                loginData.email, 
+                loginData.password
+            ).then(({ data }) => 
+                onLogin(data.login.token, data.login.userId)
+            );
+        }
     }, [loginData, onLogin]);
 
     return <div>

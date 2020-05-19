@@ -1,67 +1,61 @@
-import React, { useState, useReducer, useEffect } from 'react';
-import { getTimestampInSeconds } from './utils';
+import React, { useState, useReducer, useEffect, useCallback } from 'react';
 import './App.scss';
 import Timer from './components/Timer';
 import TaskInput from './components/TaskInput';
 import LoginForm from './components/LoginForm';
-import { fetchTimer, createTimer, pauseTimer, resumeTimer } from './network';
-
-export interface AppState {
-  authData: {
-    token: string;
-    userId: string;
-  },
-  currentTimer: any;
-}
-
-export function reducer(state: AppState, action: any) {
-  switch(action.type) {
-    case 'LOGIN':
-      return {
-        ...state,
-        authData: action.payload
-      };
-    case 'SET_CURRENT_TIMER':
-      return {
-        ...state,
-        currentTimer: action.payload
-      }; 
-  }
-
-  return state;
-}
+import Header from './components/Header';
+import { 
+  createTask,
+  markTaskCompleted,
+  fetchCurrentUser
+} from './network';
+import { reducer, ACTIONS } from './reducer';
 
 const initialState = {
   authData: localStorage.getItem('authData') ? 
     JSON.parse(localStorage.getItem('authData')!) : null,
-  currentTimer: null  
+  currentTimer: null,
+  currentUser: null
 };
 
 function App() {
-  const [completedTasks, setCompletedTasks] = useState<string[]>([]);
-  const [task, setTask] = useState('');
+  const [completedTasks, setCompletedTasks] = useState<any[]>([]);
+  const [task, setTask] = useState<any>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const markComplete = () => {
-    setCompletedTasks([
-      ...completedTasks,
-      task
-    ]);
-    setTask('');
+    markTaskCompleted(
+      task._id, 
+      state.authData!.token
+    ).then((ct) => {
+      setCompletedTasks([
+        ...completedTasks,
+        task
+      ]);
+      setTask(null);
+    });
   };
 
-  useEffect(() => {
-    if (localStorage.getItem('currentTimer')) {
-      fetchTimer(
-        localStorage.getItem('currentTimer')!, 
-        state.authData.token
-      ).then(({ data }) => {
-        dispatch({
-          type: 'SET_CURRENT_TIMER',
-          payload: data.timer
-        });
+  const addTask = useCallback((title: string) => {
+    createTask(title, state.authData!.token)
+      .then((task) => {
+        setTask(task)
       });
+  }, [state.authData]);
+
+  useEffect(() => {
+    if(state.authData) {
+      fetchCurrentUser(state.authData.token)
+        .then(
+          (user) => dispatch({
+            type: ACTIONS.USER.SET_CURRENT,
+            payload: user
+          }),
+          () => dispatch({
+            type: ACTIONS.USER.LOGOUT
+          })
+        );
     }
   }, []);
 
@@ -77,92 +71,58 @@ function App() {
     }
   }, [state.currentTimer]);
 
+  const onLogin = useCallback((token, userId) => {
+    setShowLogin(false);
+    dispatch({
+      type: 'LOGIN',
+      payload: {
+        token,
+        userId
+      }
+    });
+    fetchCurrentUser(token)
+        .then(
+          (user) => dispatch({
+            type: ACTIONS.USER.SET_CURRENT,
+            payload: user
+          }),
+          () => dispatch({
+            type: ACTIONS.USER.LOGOUT
+          })
+        );
+  }, [dispatch, setShowLogin]);
+
   return (
     <div className='app'>
+      <Header
+        user={state.currentUser}
+        triggerLogin={() => setShowLogin(true)}
+        triggerLogout={() =>  dispatch({
+          type: ACTIONS.USER.LOGOUT
+        })}
+      />
        <div className='main'>
-       {
-          !showLogin && !state.authData && <button 
-            type='button' 
-            onClick={() => setShowLogin(true)}
-          >
-            Login
-          </button>
-       }
-        <Timer
-          currentTimer={state.currentTimer}
-          onPause={
-            () => {
-              pauseTimer(
-                state.currentTimer._id, 
-                state.authData.token
-              ).then(
-                ({ data }) => {
-                  dispatch({
-                    type: 'SET_CURRENT_TIMER',
-                    payload: data.pauseTimer
-                  });
-                }
-              )
-            }
-          }
-          onEnd={() => console.log('end')}
-          onStart={() => {
-            if(state.authData && state.authData.token) {
-              if (state.currentTimer) {
-                resumeTimer(
-                  state.currentTimer._id, 
-                  state.authData.token
-                ).then(
-                  ({ data }) => {
-                    dispatch({
-                      type: 'SET_CURRENT_TIMER',
-                      payload: data.createTimer
-                    });
-                  }
-                );
-              } else {
-                createTimer(
-                  getTimestampInSeconds(), 
-                  state.authData.token
-                ).then(
-                  ({ data }) => {
-                    dispatch({
-                      type: 'SET_CURRENT_TIMER',
-                      payload: data.createTimer
-                    });
-                  }
-                );
-              }
-            }
-          }}
-        />
         {
           task ? <div className='task'>
             <i 
               className='material-icons icon'
               onClick={markComplete}
-            >check_box_outline_blank</i>&nbsp;{task}
+            >check_box_outline_blank</i>&nbsp;{task.title}
           </div> : <TaskInput
-            onSubmit={(value) => setTask(value)}
+            onSubmit={addTask}
           />
         }
         {
-          completedTasks.map((ct) => <div className='completed'>
-            <i className='material-icons icon'>check_box</i>&nbsp;{ct}
+          completedTasks.map((ct) => <div 
+            key={ct._id}
+            className='completed'
+          >
+            <i className='material-icons icon'>check_box</i>&nbsp;{ct.title}
           </div>)
         }
         {
           showLogin && <LoginForm 
-            onLogin={(token, userId) => {
-              setShowLogin(false);
-              dispatch({
-                type: 'LOGIN',
-                payload: {
-                  token,
-                  userId
-                }
-              });
-            }}
+            onLogin={onLogin}
           />
         }
        </div>
