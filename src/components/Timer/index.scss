@@ -1,12 +1,14 @@
 @import "../../colors";
 
 .timer {
-    color: $light-grey;
+    color: white;
     margin-bottom: 30px;
+    margin-bottom: 80px;
 }
 
 .timer-time {
-    font-size: 10rem;
+    margin-top: -265px;
+    font-size: 8rem;
 }
 
 .timer-button {
@@ -14,7 +16,7 @@
     width: 50px;
     height: 50px;
     background: transparent;
-    border: 2px solid $light-grey;
+    border: 2px solid white;
     border-radius: 50%;
     font-size: 1rem;
     cursor: pointer;

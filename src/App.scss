@@ -1,5 +1,9 @@
 @import 'colors';
 
+body {
+  color: grey;
+}
+
 .app { 
   height: 100vh;
   text-align: center;
@@ -40,5 +44,3 @@
   cursor: pointer;
   text-decoration: underline;
 }
-
-

@@ -1,11 +1,15 @@
 import React, { useState, useReducer, useEffect, useCallback } from 'react';
 import './App.scss';
-import Timer from './components/Timer';
+import Timers from './components/Timers';
+import { TimerDescriptor } from './types';
 import TaskInput from './components/TaskInput';
 import LoginForm from './components/LoginForm';
+import WelcomeBanner from './components/WelcomeBanner';
 import Header from './components/Header';
 import { 
   createTask,
+  createTimeRecord,
+  updateTimeRecordDuration,
   markTaskCompleted,
   fetchCurrentUser
 } from './network';
@@ -23,6 +27,7 @@ function App() {
   const [task, setTask] = useState<any>(null);
   const [showLogin, setShowLogin] = useState(false);
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [currentTimer, setCurrentTimer] = useState<any>(null);
 
   const markComplete = () => {
     markTaskCompleted(
@@ -43,6 +48,20 @@ function App() {
         setTask(task)
       });
   }, [state.authData]);
+
+  const addTimeRecord = useCallback((timer: TimerDescriptor) => {
+    createTimeRecord(timer.duration - timer.remains, state.authData!.token)
+      .then(setCurrentTimer);
+  }, [state.authData, setCurrentTimer]);
+
+  const updateTimeRecord = useCallback((timer: TimerDescriptor) => {
+      if(currentTimer) {
+        updateTimeRecordDuration(currentTimer.id, timer.duration - timer.remains, state.authData!.token)
+            .then((timer) => {
+            console.log(timer);
+            });
+      }
+  }, [state.authData, currentTimer]);
 
   useEffect(() => {
     if(state.authData) {
@@ -94,38 +113,47 @@ function App() {
 
   return (
     <div className='app'>
-      <Header
-        user={state.currentUser}
-        triggerLogin={() => setShowLogin(true)}
-        triggerLogout={() =>  dispatch({
-          type: ACTIONS.USER.LOGOUT
-        })}
-      />
-       <div className='main'>
+        <Header
+            user={state.currentUser}
+            triggerLogin={() => setShowLogin(true)}
+            triggerLogout={() =>  dispatch({
+                type: ACTIONS.USER.LOGOUT
+            })}
+        />
         {
-          task ? <div className='task'>
-            <i 
-              className='material-icons icon'
-              onClick={markComplete}
-            >check_box_outline_blank</i>&nbsp;{task.title}
-          </div> : <TaskInput
-            onSubmit={addTask}
-          />
+            state.authData || showLogin ? <div className='main'>
+                {
+                    showLogin ? <LoginForm 
+                        onLogin={onLogin}
+                    /> : <>
+                        <Timers
+                            onTimerCompleted={addTimeRecord}
+                        />
+                        {
+                            task ? <div className='task'>
+                                <i 
+                                    className='material-icons icon'
+                                    onClick={markComplete}
+                                >
+                                    check_box_outline_blank
+                                </i>&nbsp;{task.title}
+                                </div> : <TaskInput
+                                    onSubmit={addTask}
+                                />
+                        }
+                        {
+                            completedTasks.map((ct) => <div 
+                                key={ct._id}
+                                className='completed'
+                            >
+                                <i className='material-icons icon'>check_box</i>&nbsp;{ct.title}
+                            </div>)
+                        }
+                    </>
+                }
+           </div> : <WelcomeBanner />
         }
-        {
-          completedTasks.map((ct) => <div 
-            key={ct._id}
-            className='completed'
-          >
-            <i className='material-icons icon'>check_box</i>&nbsp;{ct.title}
-          </div>)
-        }
-        {
-          showLogin && <LoginForm 
-            onLogin={onLogin}
-          />
-        }
-       </div>
+
     </div>
   );
 }

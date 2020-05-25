@@ -34,7 +34,7 @@ const Header: FC<Props> = ({ triggerLogout, triggerLogin, user }) => {
                     </div> : <span 
                         onClick={triggerLogin}
                         className='link'>
-                        Login
+                        Sign In
                     </span>
                 }
                 

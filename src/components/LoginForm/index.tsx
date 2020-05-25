@@ -22,7 +22,8 @@ const LoginForm: FC<Props> = ({ onLogin }) => {
         }
     }, [loginData, onLogin]);
 
-    return <div>
+    return <div className='login-form'>
+        <h3>Sign In</h3>
         <input 
             type='email' 
             value={loginData.email}

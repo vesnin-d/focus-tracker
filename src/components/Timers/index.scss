@@ -1,0 +1,48 @@
+@import '../../colors';
+
+.timers {
+    margin-bottom: 20px;
+}
+
+.timers-header {
+    color: grey;
+}
+
+.timer-options {
+    display: flex;
+    padding-top: 20px;
+    justify-content: space-around;
+}
+
+.timer-option {
+    cursor: pointer;
+    color: $coral;
+    transition: all 0.15s;
+
+    &:hover {
+        transform: scale(1.1);
+        color: $blue;
+    }
+}
+
+.timer-option-icon {
+    .material-icons {
+        font-size: 8em;
+    }
+}
+
+.timer-option-title {
+    font-size: 24px;
+}
+
+.timers-completion-controls {
+    display: flex;
+    justify-content: space-around;
+    font-size: 20px;
+}
+
+.timers-completion-control {
+    cursor: pointer;
+    color: $coral;
+    text-decoration: underline;
+}

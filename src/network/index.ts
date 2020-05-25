@@ -1,89 +1,120 @@
 import { fetchGraphQL, API_URL } from './utils';
 
-const LOGIN_QUERY = `query Login($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
-    token,
-    userId
-  }
-}`;
+const Queries = {
+    Login: `query Login($email: String!, $password: String!) {
+        login(email: $email, password: $password) {
+            token,
+            userId
+        }
+    }`,
+    CurrentUser: `{
+        user {
+            id,
+            email
+        }
+    }`
+};
 
-const CURRENT_USER_QUERY = `{
-  user {
-    _id,
-    email
-  }
-}`;
-
-const CREATE_TASK_MUTATION = `mutation CreateTask($title: String!) {
-  addTask(title: $title) {
-    _id,
-    title,
-    isCompleted
-  }
-}`;
-
-const COMPLETE_TASK_MUTATION = `mutation MarkTaskCompleted($taskId: ID!) {
-  completeTask(id: $taskId) {
-    _id,
-    title,
-    isCompleted
-  }
-}`;
+const Mutations = {
+    CreateTask: `mutation CreateTask($title: String!) {
+        addTask(title: $title) {
+            id,
+            title,
+            isCompleted
+        }
+    }`,
+    CompleteTask: `mutation MarkTaskCompleted($taskId: ID!) {
+        completeTask(id: $taskId) {
+            id,
+            title,
+            isCompleted
+        }
+    }`,
+    CreateTimeRecord: `mutation CreateTimeRecord($duration: Int!) {
+        addTimeRecord(duration: $duration) {
+            id,
+            duration
+        }
+    }`,
+    UpdateTimeRecordDuration: `mutation UpdateTimeRecordDuration($id: ID!, $duration: Int!) {
+        updateTimeRecordDuration(timeRecordId: $id, newDuration: $duration) {
+            id,
+            duration
+        }
+    }`
+};
 
 export async function login(email: string, password: string) {
     // Fetch data from GitHub's GraphQL API:
     const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          query: LOGIN_QUERY,
-          variables: { email, password }
+            query: Queries.Login,
+            variables: { email, password },
         }),
-      });
+    });
 
     // Get the response as JSON
     return await response.json();
-} 
+}
 
 export function fetchCurrentUser(token: string) {
-  return fetchGraphQL(
-    CURRENT_USER_QUERY,
-    token
-  ).then(({ data, errors}) => {
-    if(data) {
-      return data.user;
-    }
+    return fetchGraphQL(Queries.CurrentUser, token).then(({ data, errors }) => {
+        if (data) {
+            return data.user;
+        }
 
-    throw errors[0];
-  });
+        throw errors[0];
+    });
 }
 
 export function createTask(title: string, token: string) {
-  return fetchGraphQL(
-    CREATE_TASK_MUTATION,
-    token,
-    { title }
-  ).then(({ data, errors}) => {
-    if(data) {
-      return data.addTask;
-    }
+    return fetchGraphQL(Mutations.CreateTask, token, { title }).then(
+        ({ data, errors }) => {
+            if (data) {
+                return data.addTask;
+            }
 
-    throw errors;
-  });
+            throw errors;
+        }
+    );
 }
 
 export function markTaskCompleted(taskId: string, token: string) {
-  return fetchGraphQL(
-    COMPLETE_TASK_MUTATION,
-    token,
-    { taskId }
-  ).then(({ data, errors}) => {
-    if(data) {
-      return data.markTaskCompleted;
-    }
+    return fetchGraphQL(Mutations.CompleteTask, token, { taskId }).then(
+        ({ data, errors }) => {
+            if (data) {
+                return data.markTaskCompleted;
+            }
 
-    throw errors;
-  });
+            throw errors;
+        }
+    );
+}
+
+export function createTimeRecord(duration: number, token: string) {
+    return fetchGraphQL(Mutations.CreateTimeRecord, token, { duration }).then(
+        ({ data, errors }) => {
+            if (data) {
+                return data.addTimeRecord;
+            }
+
+            throw errors;
+        }
+    );
+}
+
+export function updateTimeRecordDuration(id: string, duration: number, token: string) {
+    return fetchGraphQL(Mutations.UpdateTimeRecordDuration, token, { id, duration }).then(
+        ({ data, errors }) => {
+            if (data) {
+                return data.updateTimeRecordDuration;
+            }
+
+            throw errors;
+        }
+    );
 }
