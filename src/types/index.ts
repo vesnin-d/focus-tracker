@@ -5,3 +5,9 @@ export interface TimerDescriptor {
     isRunning: boolean;
     isCompleted: boolean;
 }
+
+export interface Task {
+    id?: string;
+    title: string;
+    isCompleted: boolean;
+}

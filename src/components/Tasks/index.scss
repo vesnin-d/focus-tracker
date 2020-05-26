@@ -1,0 +1,22 @@
+@import '../../colors';
+
+.task {
+    display: flex;
+    width: 80%;
+    margin: auto;
+    padding: 15px 10px;
+    margin-bottom: 10px;
+    background-color: $light-grey;
+    box-shadow: 2px 2px $blue;
+    cursor: pointer;
+
+    .icon {
+        vertical-align: bottom;
+        cursor: pointer;
+    }
+}
+
+.tasks-list {
+    max-height: 380px;
+    overflow: scroll;
+}

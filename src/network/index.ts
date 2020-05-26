@@ -10,7 +10,11 @@ const Queries = {
     CurrentUser: `{
         user {
             id,
-            email
+            email,
+            tasks {
+                id,
+                title
+            }
         }
     }`
 };
@@ -30,8 +34,8 @@ const Mutations = {
             isCompleted
         }
     }`,
-    CreateTimeRecord: `mutation CreateTimeRecord($duration: Int!) {
-        addTimeRecord(duration: $duration) {
+    CreateTimeRecord: `mutation CreateTimeRecord($duration: Int!, $taskId: ID) {
+        addTimeRecord(duration: $duration, taskId: $taskId) {
             id,
             duration
         }
@@ -87,7 +91,7 @@ export function markTaskCompleted(taskId: string, token: string) {
     return fetchGraphQL(Mutations.CompleteTask, token, { taskId }).then(
         ({ data, errors }) => {
             if (data) {
-                return data.markTaskCompleted;
+                return data.completeTask;
             }
 
             throw errors;
@@ -95,8 +99,9 @@ export function markTaskCompleted(taskId: string, token: string) {
     );
 }
 
-export function createTimeRecord(duration: number, token: string) {
-    return fetchGraphQL(Mutations.CreateTimeRecord, token, { duration }).then(
+export function createTimeRecord(duration: number, taskId?: string, token?: string) {
+    console.log(taskId);
+    return fetchGraphQL(Mutations.CreateTimeRecord, token!, { duration, taskId }).then(
         ({ data, errors }) => {
             if (data) {
                 return data.addTimeRecord;

@@ -4,6 +4,21 @@ body {
   color: grey;
 }
 
+button {
+    cursor: pointer;
+
+    &.outline {
+        color: $blue;
+        border-color: $blue;
+    
+        &:hover {
+            background-color: $blue;
+            border-color: $blue;
+            color: white;
+        }
+    }
+}
+
 .app { 
   height: 100vh;
   text-align: center;
@@ -25,18 +40,6 @@ body {
 .main {
   width: 640px;
   margin: auto;
-}
-
-.task {
-  display: inline-block;
-  padding: 5px 10px;
-  color: $light-grey;
-  border-bottom: 1px solid $light-blue;
-
-  .icon {
-    vertical-align: bottom;
-    cursor: pointer;
-  }
 }
 
 .link {

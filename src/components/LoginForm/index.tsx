@@ -48,9 +48,10 @@ const LoginForm: FC<Props> = ({ onLogin }) => {
         />
         <button
             type='button'
+            className='outline'
             onClick={handleLogin}
         >
-            Login
+            Sign In
         </button>
     </div>
 };

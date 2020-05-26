@@ -16,6 +16,7 @@ const TaskInput: FC<Props> = ({ onSubmit }) => {
                 const trimmed = value.trim();
 
                 trimmed && onSubmit(trimmed); 
+                setValue('');
             }   
         }}
         placeholder='What are you doing right now?'

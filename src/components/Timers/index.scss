@@ -18,10 +18,12 @@
     cursor: pointer;
     color: $coral;
     transition: all 0.15s;
+    text-shadow: 1px 1px 0 transparent;
 
     &:hover {
         transform: scale(1.1);
-        color: $blue;
+        text-shadow: 1px 1px 0 $light-grey;
+        color: grey;
     }
 }
 
