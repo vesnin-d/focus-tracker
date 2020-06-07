@@ -37,7 +37,8 @@ const Mutations = {
     CreateTimeRecord: `mutation CreateTimeRecord($duration: Int!, $taskId: ID) {
         addTimeRecord(duration: $duration, taskId: $taskId) {
             id,
-            duration
+            duration,
+            tasks
         }
     }`,
     UpdateTimeRecordDuration: `mutation UpdateTimeRecordDuration($id: ID!, $duration: Int!) {

@@ -42,5 +42,6 @@
   "prettier": {
     "tabWidth": 4,
     "singleQuote": true
-  }
+  },
+  "proxy": "https://still-inlet-67918.herokuapp.com/"
 }
