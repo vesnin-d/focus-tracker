@@ -10,7 +10,12 @@ button {
     &.outline {
         color: $blue;
         border-color: $blue;
-    
+        line-height: 24px;
+         
+        i {
+            vertical-align: middle;
+        }
+
         &:hover {
             background-color: $blue;
             border-color: $blue;
