@@ -52,3 +52,8 @@ button {
   cursor: pointer;
   text-decoration: underline;
 }
+
+.disabled {
+    pointer-events: none;
+    opacity: .7;
+}

@@ -15,11 +15,11 @@ import {
 import { reducer, ACTIONS } from './reducer';
 
 const initialState = {
-  authData: localStorage.getItem('authData') ? 
-    JSON.parse(localStorage.getItem('authData')!) : null,
-  currentTimer: null,
-  currentUser: null,
-  tasks: []
+    authData: localStorage.getItem('authData') ? 
+        JSON.parse(localStorage.getItem('authData')!) : null,
+    currentTaskId: localStorage.getItem('currentTaskId') ?? null,
+    currentUser: null,
+    tasks: []
 };
 
 function App() {
@@ -39,7 +39,7 @@ function App() {
                     })
                 );
         }
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if(state.authData) {
@@ -48,19 +48,29 @@ function App() {
     }, [state.authData]);
 
     useEffect(() => {
-        if(state.currentTimer) {
-            localStorage.setItem('currentTimer', state.currentTimer.id);
+        if(state.currentTaskId) {
+            localStorage.setItem('currentTaskId', state.currentTaskId);
         }
-    }, [state.currentTimer]);
+    }, [state.currentTaskId]);
 
     const markCompleted = (task: Task) => {
+        dispatch({
+            type: ACTIONS.TASK.UPDATE,
+            payload: {
+                ...task,
+                isUpdating: true
+            }
+        });
+
         markTaskCompleted(
             task.id!, 
             state.authData!.token
-        ).then((ct) => dispatch({
-            type: ACTIONS.TASK.UPDATE,
-            payload: ct
-        }));
+        ).then((ct) => {
+            dispatch({
+                type: ACTIONS.TASK.UPDATE,
+                payload: ct
+            });
+        });
     };
 
     const addTask = useCallback((title: string) => {
@@ -77,13 +87,24 @@ function App() {
             });
     }, [state.authData]);
 
+    const setCurrentTask = useCallback((task: Task) =>
+        dispatch({
+            type: ACTIONS.TASK.SET_CURRENT,
+            payload: task.id
+        }), [dispatch]);
+
     const addTimeRecord = useCallback((timer: TimerDescriptor) => {
         createTimeRecord(
             timer.duration, 
             state.currentTaskId,
             state.authData!.token
-        );
-    }, [state.authData, state.currentTaskId]);
+        ).then((tr) => {
+            dispatch({
+                type: ACTIONS.TASK.UPDATE,
+                payload: tr.task
+            });
+        });
+    }, [state.authData, state.currentTaskId, dispatch]);
 
     const onLogin = useCallback((token, userId) => {
         setShowLogin(false);
@@ -105,37 +126,39 @@ function App() {
                     type: ACTIONS.USER.LOGOUT
                 })
             );
-  }, [dispatch, setShowLogin]);
+    }, [dispatch, setShowLogin]);
 
-  return (
-    <div className='app'>
-        <Header
-            user={state.currentUser}
-            triggerLogin={() => setShowLogin(true)}
-            triggerLogout={() =>  dispatch({
-                type: ACTIONS.USER.LOGOUT
-            })}
-        />
-        {
-            state.authData || showLogin ? <div className='main'>
-                {
-                    showLogin ? <LoginForm 
-                        onLogin={onLogin}
-                    /> : <>
-                        <Timers
-                            onTimerCompleted={addTimeRecord}
-                        />
-                        <Tasks 
-                            tasks={state.tasks} 
-                            markCompleted={markCompleted}
-                            addTask={addTask}
-                        />
-                    </>
-                }
-           </div> : <WelcomeBanner />
-        }
-    </div>
-  );
+    return (
+        <div className='app'>
+            <Header
+                user={state.currentUser}
+                triggerLogin={() => setShowLogin(true)}
+                triggerLogout={() =>  dispatch({
+                    type: ACTIONS.USER.LOGOUT
+                })}
+            />
+            {
+                state.authData || showLogin ? <div className='main'>
+                    {
+                        showLogin ? <LoginForm 
+                            onLogin={onLogin}
+                        /> : <>
+                            <Timers
+                                onTimerCompleted={addTimeRecord}
+                            />
+                            <Tasks 
+                                setCurrentTask={setCurrentTask}
+                                currentTask={state.tasks.find(task => task.id === state.currentTaskId)}
+                                tasks={state.tasks} 
+                                markCompleted={markCompleted}
+                                addTask={addTask}
+                            />
+                        </>
+                    }
+            </div> : <WelcomeBanner />
+            }
+        </div>
+    );
 }
 
 export default App;

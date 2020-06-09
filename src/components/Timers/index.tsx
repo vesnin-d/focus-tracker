@@ -11,7 +11,7 @@ export interface Props {
 
 const timerOptions = [
     {
-        title: 'half min',
+        title: '15 sec',
         duration: 15
     },
     {
@@ -25,8 +25,8 @@ const timerOptions = [
 ];
 
 const Timers: FC<Props> = ({ onTimerCompleted }) => {
-    const [originalDocumentTitle] = useState(document.title);
     const [currentTimer, setCurrentTimer] = useState<TimerDescriptor | null>(null);
+    const [originalDocumentTitle] = useState(document.title);
 
     useEffect(() => {
         if(!currentTimer) {
@@ -41,13 +41,13 @@ const Timers: FC<Props> = ({ onTimerCompleted }) => {
             document.title = originalDocumentTitle;
         };
         
-    }, [currentTimer]);
+    }, [currentTimer, originalDocumentTitle]);
 
     useEffect(() => {
         if(currentTimer && currentTimer.isCompleted) {
             onTimerCompleted(currentTimer);
         }
-    }, [currentTimer]);
+    }, [currentTimer, onTimerCompleted]);
 
     const handleTimerOptionClick = useCallback((option) => {
         setCurrentTimer({
@@ -58,16 +58,20 @@ const Timers: FC<Props> = ({ onTimerCompleted }) => {
         });
     }, [setCurrentTimer]);
 
-    const handleTimerTick = useCallback(() => {    
-        setCurrentTimer((currentTimer) => {
-            return currentTimer!?.remains > 0 ? {
-                ...currentTimer as TimerDescriptor,
-                remains: (currentTimer as any).remains - 1
-            } : {
-                ...currentTimer as TimerDescriptor,
-                isRunning: false,
-                isCompleted: true
+    const handleTimerTick = useCallback(() => {
+        setCurrentTimer((ct) => {
+            if (ct) {
+                return ct.remains > 0 ? {
+                    ...ct,
+                    remains: ct.remains - 1
+                } : {
+                    ...ct,
+                    isRunning: false,
+                    isCompleted: true
+                };
             }
+
+            return ct;
         });
     }, [setCurrentTimer]);
 

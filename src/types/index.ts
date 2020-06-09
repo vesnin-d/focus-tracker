@@ -10,4 +10,8 @@ export interface Task {
     id?: string;
     title: string;
     isCompleted: boolean;
+    isUpdating?: boolean;
+    timeRecords?: Array<{
+        duration: number;
+    }>
 }

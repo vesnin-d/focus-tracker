@@ -1,4 +1,4 @@
-import { fetchGraphQL, API_URL } from './utils';
+import { fetchGraphQL, API_URL, getGraphQLResponseHandler } from './utils';
 
 const Queries = {
     Login: `query Login($email: String!, $password: String!) {
@@ -13,7 +13,10 @@ const Queries = {
             email,
             tasks {
                 id,
-                title
+                title,
+                timeRecords {
+                    duration
+                }
             }
         }
     }`
@@ -38,7 +41,14 @@ const Mutations = {
         addTimeRecord(duration: $duration, taskId: $taskId) {
             id,
             duration,
-            tasks
+            task {
+                id,
+                title,
+                isCompleted,
+                timeRecords {
+                    duration
+                }
+            }
         }
     }`,
     UpdateTimeRecordDuration: `mutation UpdateTimeRecordDuration($id: ID!, $duration: Int!) {
@@ -50,7 +60,6 @@ const Mutations = {
 };
 
 export async function login(email: string, password: string) {
-    // Fetch data from GitHub's GraphQL API:
     const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
@@ -62,65 +71,31 @@ export async function login(email: string, password: string) {
         }),
     });
 
-    // Get the response as JSON
-    return await response.json();
+    return await response.json()
+        .then(getGraphQLResponseHandler('login'));
 }
 
 export function fetchCurrentUser(token: string) {
-    return fetchGraphQL(Queries.CurrentUser, token).then(({ data, errors }) => {
-        if (data) {
-            return data.user;
-        }
-
-        throw errors[0];
-    });
+    return fetchGraphQL(Queries.CurrentUser, token)
+        .then(getGraphQLResponseHandler('user'));
 }
 
 export function createTask(title: string, token: string) {
-    return fetchGraphQL(Mutations.CreateTask, token, { title }).then(
-        ({ data, errors }) => {
-            if (data) {
-                return data.addTask;
-            }
-
-            throw errors;
-        }
-    );
+    return fetchGraphQL(Mutations.CreateTask, token, { title })
+        .then(getGraphQLResponseHandler('addTask'));
 }
 
 export function markTaskCompleted(taskId: string, token: string) {
-    return fetchGraphQL(Mutations.CompleteTask, token, { taskId }).then(
-        ({ data, errors }) => {
-            if (data) {
-                return data.completeTask;
-            }
-
-            throw errors;
-        }
-    );
+    return fetchGraphQL(Mutations.CompleteTask, token, { taskId })
+        .then(getGraphQLResponseHandler('completeTask'));
 }
 
-export function createTimeRecord(duration: number, taskId?: string, token?: string) {
-    console.log(taskId);
-    return fetchGraphQL(Mutations.CreateTimeRecord, token!, { duration, taskId }).then(
-        ({ data, errors }) => {
-            if (data) {
-                return data.addTimeRecord;
-            }
-
-            throw errors;
-        }
-    );
+export function createTimeRecord(duration: number, taskId: string | null, token?: string) {
+    return fetchGraphQL(Mutations.CreateTimeRecord, token!, { duration, taskId })
+        .then(getGraphQLResponseHandler('addTimeRecord'));
 }
 
 export function updateTimeRecordDuration(id: string, duration: number, token: string) {
-    return fetchGraphQL(Mutations.UpdateTimeRecordDuration, token, { id, duration }).then(
-        ({ data, errors }) => {
-            if (data) {
-                return data.updateTimeRecordDuration;
-            }
-
-            throw errors;
-        }
-    );
+    return fetchGraphQL(Mutations.UpdateTimeRecordDuration, token, { id, duration })
+        .then(getGraphQLResponseHandler('updateTimeRecordDuration'));
 }

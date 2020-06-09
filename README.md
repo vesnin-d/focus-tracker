@@ -1,6 +1,8 @@
 
 # focus-tracker
 
+[![Travis Build](https://img.shields.io/travis/vesnin-d/focus-tracker?logo=travis)](https://travis-ci.org/vesnin-d/focus-tracker)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

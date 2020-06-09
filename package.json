@@ -6,6 +6,8 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "@types/classnames": "^2.2.10",
+    "classnames": "^2.2.6",
     "lodash": "^4.17.15",
     "node-sass": "^4.13.1",
     "react": "^16.13.1",
@@ -15,6 +17,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:ci": "serve -p 3000 -s build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -37,11 +40,13 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.152",
-    "prettier": "2.0.5"
+    "cypress": "^4.8.0",
+    "prettier": "2.0.5",
+    "serve": "^11.3.2",
+    "wait-on": "^5.0.1"
   },
   "prettier": {
     "tabWidth": 4,
     "singleQuote": true
-  },
-  "proxy": "https://still-inlet-67918.herokuapp.com/"
+  }
 }
