@@ -1,4 +1,4 @@
-import { Task, TimerDescriptor } from './types';
+import { Task } from './types';
 
 export interface AuthData {
   token: string;

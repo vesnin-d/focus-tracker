@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useCallback } from 'react';
+import React, { FC, useEffect } from 'react';
 import './index.scss';
 import { TimerDescriptor } from '../../types';
 import { getFormattedTimeFromSeconds } from '../../utils';
@@ -25,7 +25,7 @@ const Timer: FC<Props> = ({ currentTimer, onTick, onStart, onPause, onCancel }) 
                 clearInterval(intervalId);
             };
         }
-    }, [currentTimer.isRunning]);
+    }, [currentTimer.isRunning]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const timeLeft = getFormattedTimeFromSeconds(currentTimer.remains);
 

@@ -41,13 +41,13 @@ const Timers: FC<Props> = ({ onTimerCompleted }) => {
             document.title = originalDocumentTitle;
         };
         
-    }, [currentTimer]);
+    }, [currentTimer, originalDocumentTitle]);
 
     useEffect(() => {
         if(currentTimer && currentTimer.isCompleted) {
             onTimerCompleted(currentTimer);
         }
-    }, [currentTimer]);
+    }, [currentTimer, onTimerCompleted]);
 
     const handleTimerOptionClick = useCallback((option) => {
         setCurrentTimer({

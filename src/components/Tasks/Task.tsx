@@ -1,7 +1,6 @@
 import React, { FC } from 'react';
 import classNames from 'classnames';
 import Icon from '../Icon';
-import { TimerDescriptor } from '../../types';
 
 export interface Props {
     title: string;
