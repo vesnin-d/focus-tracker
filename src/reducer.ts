@@ -1,4 +1,4 @@
-import { Task } from './types';
+import { Task, TimerDescriptor } from './types';
 
 export interface AuthData {
   token: string;
@@ -7,10 +7,9 @@ export interface AuthData {
 
 export interface AppState {
     authData: AuthData | null,
-    currentTimer: any;
     currentUser: any;
     tasks: Task[];
-    currentTaskId?: string;
+    currentTaskId: string | null;
 }
 
 export const ACTIONS = {
@@ -45,14 +44,7 @@ export function reducer(state: AppState, action: any): AppState {
                 currentUser: action.payload,
                 tasks: action.payload.tasks
             }; 
-        case ACTIONS.USER.LOGOUT:
-            return {
-                ...state,
-                authData: null,
-                currentUser: null
-            };
         case ACTIONS.TASK.ADD:
-            console.log(action.payload, state.tasks);
             return {
                 ...state,
                 tasks: [

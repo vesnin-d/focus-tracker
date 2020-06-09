@@ -1,4 +1,5 @@
 import React, { FC, useState, useCallback } from 'react';
+import classNames from 'classnames';
 import { login } from '../../network';
 
 export interface Props {
@@ -6,6 +7,7 @@ export interface Props {
 }
 
 const LoginForm: FC<Props> = ({ onLogin }) => {
+    const [isDisabled, setIsDisabled] = useState(false);
     const [loginData, setLoginData] = useState({
         email: '',
         password: ''
@@ -13,21 +15,32 @@ const LoginForm: FC<Props> = ({ onLogin }) => {
 
     const handleLogin = useCallback(() => {
         if(loginData.email && loginData.password) {
+            setIsDisabled(true);
             return login(
                 loginData.email, 
                 loginData.password
-            ).then(({ data }) => 
-                onLogin(data.login.token, data.login.userId)
+            ).then(({ token, userId }) => 
+                onLogin(token, userId)
+            ).finally(
+                () => setIsDisabled(false)
             );
         }
-    }, [loginData, onLogin]);
+    }, [loginData, onLogin, setIsDisabled]);
 
-    return <div className='login-form'>
+    return <div className={
+        classNames(
+            'login-form',
+            {
+                disabled: isDisabled
+            }
+        )
+    }>
         <h3>Sign In</h3>
         <input 
             type='email' 
             value={loginData.email}
             placeholder='Email'
+            disabled={isDisabled}
             onChange={ev => {
                 setLoginData({
                     ...loginData,
@@ -39,6 +52,7 @@ const LoginForm: FC<Props> = ({ onLogin }) => {
             type='password' 
             value={loginData.password}
             placeholder='Password'
+            disabled={isDisabled}
             onChange={ev => {
                 setLoginData({
                     ...loginData,
@@ -49,6 +63,7 @@ const LoginForm: FC<Props> = ({ onLogin }) => {
         <button
             type='button'
             className='outline'
+            disabled={isDisabled}
             onClick={handleLogin}
         >
             Sign In
